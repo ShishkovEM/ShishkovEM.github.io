@@ -1,0 +1,189 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2023-11-13T09:31:38.7069629"><meta name="build-number" content="${buildNumber}">       <title>SQL-скрипты | Функционал отображения списка инвестидей</title><script id="virtual-toc-data" type="application/json">[{"id":"ddl","level":0,"title":"DDL (создание таблиц)","anchor":"#ddl"},{"id":"dml","level":0,"title":"DML (вставка проверочных данных)","anchor":"#dml"},{"id":"api","level":0,"title":"Хранимые процедуры для работы эндпойнтов API","anchor":"#api"},{"id":"2569c48a_15","level":0,"title":"Хранимая процедура для получения списка инвест идей","anchor":"#2569c48a_15"},{"id":"2569c48a_17","level":0,"title":"Хранимая процедура для получения детального описания инвест идеи","anchor":"#2569c48a_17"},{"id":"2569c48a_19","level":0,"title":"Хранимая процедура для фильтрации инвест идей","anchor":"#2569c48a_19"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="SQL-скрипты | Функционал отображения списка инвестидей"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Функционал отображения списка инвестидей Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="sql-scripts.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="SQL-скрипты | Функционал отображения списка инвестидей"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "sql-scripts.html#webpage", "url": "sql-scripts.html", "name": "SQL-скрипты | Функционал отображения списка инвестидей", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Функционал отображения списка инвестидей Help" }</script><!-- End Schema.org --> <!-- Mermaid light/dark themes -->  <link rel="stylesheet" type="text/css" href="mermaid.css">  </head>     <body data-id="sql-scripts" data-main-title="SQL-скрипты" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Функционал отображения списка инвестидей  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="sql-scripts"  id="sql-scripts.md"  >SQL-скрипты</h1>  <p id="2569c48a_3">В настоящем разделе представлены SQL-скрипты для создания таблиц, наполнения их тестовыми данными, а также для создания хранимых процедур, релизующих возможности</p><ul class="list _ul" id="2569c48a_4"    ><li class="list__item" id="2569c48a_5"><p>просмотра списка инвестиционных идей</p></li><li class="list__item" id="2569c48a_6"><p>просмотра детального описания инвестиционной идеи</p></li><li class="list__item" id="2569c48a_7"><p>фильтрации и сортировки отображаемых инвестиционных идей</p></li></ul><p id="2569c48a_8">Скрипты написаны на диалекте PostgreSQL с использованием процедурного расширения PL/pgSQL.</p><section class="chapter"><h2 id="ddl" data-toc="ddl">DDL (создание таблиц)</h2><div class="code-block" data-lang="sql"         >
+CREATE TABLE SECURITY (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR(50),
+    name VARCHAR(255),
+    logoUrl VARCHAR(255)
+);
+
+CREATE TABLE STOCK (
+    id INTEGER PRIMARY KEY,
+    sector VARCHAR(255),
+    topStockDate DATE,
+    potentialReturn FLOAT,
+    FOREIGN KEY (id) REFERENCES SECURITY(id)
+);
+
+CREATE TABLE BOND (
+    id INTEGER PRIMARY KEY,
+    sector VARCHAR(255),
+    maturityMonths INTEGER,
+    annualYield FLOAT,
+    topBondDate DATE,
+    FOREIGN KEY (id) REFERENCES SECURITY(id)
+);
+
+CREATE TABLE FUND (
+    id INTEGER PRIMARY KEY,
+    analystOpinion VARCHAR(255),
+    priceForecast FLOAT,
+    potentialReturn FLOAT,
+    forecastUpdateDate DATE,
+    FOREIGN KEY (id) REFERENCES SECURITY(id)
+);
+
+CREATE TABLE INVEST_IDEA (
+    id SERIAL PRIMARY KEY,
+    description TEXT,
+    detailsUrl VARCHAR
+);
+</div></section><section class="chapter"><h2 id="dml" data-toc="dml">DML (вставка проверочных данных)</h2><section class="chapter"><h3 id="security" data-toc="security">Данные для таблицы SECURITY</h3><div class="code-block" data-lang="sql"         >
+INSERT INTO SECURITY (id, type, name, logoUrl) VALUES
+(1, 'Stock', 'Stock A', 'url1'),
+(2, 'Stock', 'Stock B', 'url2'),
+(3, 'Stock', 'Stock C', 'url3'),
+(4, 'Bond', 'Bond A', 'url4'),
+(5, 'Bond', 'Bond B', 'url5'),
+(6, 'Bond', 'Bond C', 'url6'),
+(7, 'Fund', 'Fund A', 'url7'),
+(8, 'Fund', 'Fund B', 'url8'),
+(9, 'Fund', 'Fund C', 'url9'),
+(10, 'Fund', 'Fund D', 'url10');
+</div></section><section class="chapter"><h3 id="stock" data-toc="stock">Данные для таблицы STOCK</h3><div class="code-block" data-lang="sql"         >
+INSERT INTO STOCK (id, sector, topStockDate, potentialReturn) VALUES
+(1, 'Technology', '2023-01-01', 5.0),
+(2, 'Healthcare', '2023-02-01', 4.5),
+(3, 'Finance', '2023-03-01', 6.0),
+(4, 'Technology', '2023-04-01', 7.0),
+(5, 'Healthcare', '2023-05-01', 4.0),
+(6, 'Technology', '2023-06-01', 5.5),
+(7, 'Finance', '2023-07-01', 6.5),
+(8, 'Technology', '2023-08-01', 7.5),
+(9, 'Healthcare', '2023-09-01', 4.8),
+(10, 'Finance', '2023-10-01', 6.2);
+</div></section><section class="chapter"><h3 id="bond" data-toc="bond">Данные для таблицы BOND</h3><div class="code-block" data-lang="sql"         >
+INSERT INTO BOND (id, sector, maturityMonths, annualYield, topBondDate) VALUES
+(1, 'Government', 24, 3.5, '2023-01-01'),
+(2, 'Corporate', 36, 4.0, '2023-02-01'),
+(3, 'Municipal', 48, 2.5, '2023-03-01'),
+(4, 'Government', 60, 3.0, '2023-04-01'),
+(5, 'Corporate', 12, 4.5, '2023-05-01'),
+(6, 'Municipal', 18, 2.0, '2023-06-01'),
+(7, 'Government', 30, 3.2, '2023-07-01'),
+(8, 'Corporate', 42, 4.2, '2023-08-01'),
+(9, 'Municipal', 54, 2.8, '2023-09-01'),
+(10, 'Government', 6, 3.8, '2023-10-01');
+</div></section><section class="chapter"><h3 id="fund" data-toc="fund">Данные для таблицы FUND</h3><div class="code-block" data-lang="sql"         >
+INSERT INTO FUND (id, analystOpinion, priceForecast, potentialReturn, forecastUpdateDate) VALUES
+(1, 'Buy', 150.0, 10.0, '2023-01-01'),
+(2, 'Hold', 120.0, 7.0, '2023-02-01'),
+(3, 'Sell', 100.0, 5.0, '2023-03-01'),
+(4, 'Buy', 200.0, 12.0, '2023-04-01'),
+(5, 'Hold', 180.0, 9.0, '2023-05-01'),
+(6, 'Sell', 160.0, 6.0, '2023-06-01'),
+(7, 'Buy', 220.0, 11.0, '2023-07-01'),
+(8, 'Hold', 140.0, 8.0, '2023-08-01'),
+(9, 'Sell', 130.0, 4.0, '2023-09-01'),
+(10, 'Buy', 210.0, 13.0, '2023-10-01');
+</div></section><section class="chapter"><h3 id="invest-idea" data-toc="invest-idea">Данные для таблицы INVEST_IDEA</h3><div class="code-block" data-lang="sql"         >
+INSERT INTO INVEST_IDEA (id, description, detailsUrl) VALUES
+(1, 'Description for Idea 1', 'url1'),
+(2, 'Description for Idea 2', 'url2'),
+(3, 'Description for Idea 3', 'url3'),
+(4, 'Description for Idea 4', 'url4'),
+(5, 'Description for Idea 5', 'url5'),
+(6, 'Description for Idea 6', 'url6'),
+(7, 'Description for Idea 7', 'url7'),
+(8, 'Description for Idea 8', 'url8'),
+(9, 'Description for Idea 9', 'url9'),
+(10, 'Description for Idea 10', 'url10');
+</div></section></section><section class="chapter"><h2 id="api" data-toc="api">Хранимые процедуры для работы эндпойнтов API</h2></section><section class="chapter"><h2 id="2569c48a_15" data-toc="2569c48a_15">Хранимая процедура для получения списка инвест идей</h2><div class="code-block" data-lang="sql"         >
+CREATE OR REPLACE FUNCTION get_invest_ideas()
+RETURNS TABLE (
+    idea_id INT,
+    idea_description TEXT,
+    idea_detailsUrl VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT id AS idea_id, description AS idea_description, detailsUrl AS idea_detailsUrl
+    FROM INVEST_IDEA;
+END;
+$$ LANGUAGE plpgsql;
+</div></section><section class="chapter"><h2 id="2569c48a_17" data-toc="2569c48a_17">Хранимая процедура для получения детального описания инвест идеи</h2><div class="code-block" data-lang="sql"         >
+CREATE 
+OR REPLACE FUNCTION get_invest_idea_details(idea_id INT) RETURNS TABLE (
+  id INT,
+  description TEXT,
+  detailsUrl VARCHAR
+) AS $$ BEGIN RETURN QUERY 
+SELECT 
+  id, 
+  description, 
+  detailsUrl 
+FROM 
+  INVEST_IDEA 
+WHERE 
+  id = idea_id;
+END;
+$$ LANGUAGE plpgsql;
+</div></section><section class="chapter"><h2 id="2569c48a_19" data-toc="2569c48a_19">Хранимая процедура для фильтрации инвест идей</h2><div class="code-block" data-lang="sql"         >
+CREATE OR REPLACE FUNCTION filter_invest_ideas(security_types VARCHAR[], order_by VARCHAR, sort_order VARCHAR)
+RETURNS TABLE (
+    id INT,
+    name VARCHAR,
+    type VARCHAR,
+    logoUrl VARCHAR,
+    sector VARCHAR,
+    topDate DATE,
+    potentialReturn FLOAT,
+    analystOpinion VARCHAR,
+    priceForecast FLOAT,
+    forecastUpdateDate DATE,
+    maturityMonths INT
+) AS $$
+BEGIN
+    IF sort_order = 'ascending' THEN
+        RETURN QUERY
+        SELECT s.id, s.name, s.type, s.logoUrl,
+               COALESCE(st.sector, b.sector) as sector,
+               COALESCE(st.topStockDate, b.topBondDate, f.forecastUpdateDate) as topDate,
+               COALESCE(st.potentialReturn, b.annualYield, f.potentialReturn) as potentialReturn,
+               f.analystOpinion, f.priceForecast, f.forecastUpdateDate,
+               b.maturityMonths
+        FROM SECURITY s
+        LEFT JOIN STOCK st ON s.id = st.id AND s.type = 'Stock'
+        LEFT JOIN BOND b ON s.id = b.id AND s.type = 'Bond'
+        LEFT JOIN FUND f ON s.id = f.id AND s.type = 'Fund'
+        WHERE (s.type = ANY(security_types) OR array_length(security_types, 1) IS NULL)
+        ORDER BY
+            CASE WHEN order_by = 'date' THEN COALESCE(st.topStockDate, b.topBondDate, f.forecastUpdateDate) END ASC,
+            CASE WHEN order_by = 'yield' THEN COALESCE(st.potentialReturn, b.annualYield, f.potentialReturn) END ASC;
+    ELSE
+        RETURN QUERY
+        SELECT s.id, s.name, s.type, s.logoUrl,
+               COALESCE(st.sector, b.sector) as sector,
+               COALESCE(st.topStockDate, b.topBondDate, f.forecastUpdateDate) as topDate,
+               COALESCE(st.potentialReturn, b.annualYield, f.potentialReturn) as potentialReturn,
+               f.analystOpinion, f.priceForecast, f.forecastUpdateDate,
+               b.maturityMonths
+        FROM SECURITY s
+        LEFT JOIN STOCK st ON s.id = st.id AND s.type = 'Stock'
+        LEFT JOIN BOND b ON s.id = b.id AND s.type = 'Bond'
+        LEFT JOIN FUND f ON s.id = f.id AND s.type = 'Fund'
+        WHERE (s.type = ANY(security_types) OR array_length(security_types, 1) IS NULL)
+        ORDER BY
+            CASE WHEN order_by = 'date' THEN COALESCE(st.topStockDate, b.topBondDate, f.forecastUpdateDate) END DESC,
+            CASE WHEN order_by = 'yield' THEN COALESCE(st.potentialReturn, b.annualYield, f.potentialReturn) END DESC;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+</div><section class="chapter"><h3 id="2569c48a_21" data-toc="2569c48a_21">Примеры использования</h3><section class="chapter"><h4 id="2569c48a_22" data-toc="2569c48a_22">Выбран тип &quot;Акции&quot;, сортировка по доходности в порядке убывания</h4><div class="code-block" data-lang="sql"         >
+SELECT * FROM filter_invest_ideas(ARRAY['Stock'], 'yield', 'descending');
+</div></section><section class="chapter"><h4 id="2569c48a_24" data-toc="2569c48a_24">Выбраны типы &quot;Облигации&quot; и &quot;Фонды&quot;, сортировка по дате в порядке возрастания</h4><div class="code-block" data-lang="sql"         >
+SELECT * FROM filter_invest_ideas(ARRAY['Bond', 'Fund'], 'date', 'ascending');
+</div></section><section class="chapter"><h4 id="2569c48a_26" data-toc="2569c48a_26">Не выбран ни один тип, сортировка по доходности в порядке возрастания</h4><div class="code-block" data-lang="sql"         >
+SELECT * FROM filter_invest_ideas(NULL, 'yield', 'ascending');
+</div><div class="code-block" data-lang="sql"         >
+SELECT * FROM filter_invest_ideas(ARRAY[]::VARCHAR[], 'yield', 'ascending');
+</div></section></section></section><div class="last-modified"> Last modified: 13 ноября 2023</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">  <a class="navigation-links__prev" href="data-model.html">Модель данных</a>   <a class="navigation-links__next" href="api-overview.html">Описание API</a>  </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.js"></script></body></html>
